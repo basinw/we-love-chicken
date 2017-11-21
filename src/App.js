@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import Index from './container'
+import Index from './container/user'
 import { injectGlobal } from 'styled-components'
 
 // import static css

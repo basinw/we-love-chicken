@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import instance from '../libs/axios'
+import swal from 'sweetalert2'
 
 const IdexContainer = styled.div`
     height: 73vh;
@@ -29,12 +30,13 @@ const OrderGroupBtn = styled.div`
 `
 
 const CardContainer = styled.div`
-    min-height: 100%;
+    min-height: 60vh;
 `
 
 const FixedIMG = styled.img`
     height: 11em;
     object-fit: cover;
+    filter: ${props => props.status === 0 && 'grayscale(100%) !important'};
 `
 
 const CatStyle = styled.div`
@@ -50,7 +52,7 @@ const Category = styled.button`
     border: 0;
     cursor: pointer;
     border-right: 1px solid #ddd;
-    ${ props => props.selectedCat === props.cat && `
+    ${ props => props.selectedCat === props.catId && `
         color: red;
         font-weight: bold;
     ` }
@@ -71,9 +73,10 @@ const CategoryBar = (props) => (
                 props.cats.map((v, i) => (
                     <Category 
                         key={i}
-                        onClick={ () => {props.onClickCat(v.cateName)} }
+                        onClick={ () => {props.onClickCat(v.cateId)} }
                         selectedCat={props.selCat}
                         cat={v.cateName}
+                        catId={v.cateId}
                     >
                         {v.cateName}
                     </Category>
@@ -136,19 +139,19 @@ const FillOrderList = props => (
     <div style={{ position: 'relative', width: '100%', height: '100%'}}>
         <StyleFillOL>
             {
-                [1,2,3,4,5,6, 1, 3, 4].map((v, i) => (
-                    <div style={{ minHeight: '50px' }}>
+                props.cartList.map((v, i) => (
+                    <div key={i} style={{ minHeight: '50px' }}>
                         <div className="row">
                             <div className="col-7 no-pad-r text-left" style={{paddingTop: '0px'}}>
-                                menu menumenu ( s )
+                                {v.menuName} ({v.size})
                             </div>
                             <div className="col-5 no-pad-a text-center">
                                 <StyleOrderQuan
-                                
+                                    onClick={() => props.editQ(v,'-')}
                                 ><i className='fa fa-minus' /></StyleOrderQuan>
-                                <NoQuan>{v}</NoQuan>
+                                <NoQuan>{v.quantity}</NoQuan>
                                 <StyleOrderQuan
-                                
+                                    onClick={() => props.editQ(v,'+')}                                    
                                 ><i className='fa fa-plus' /></StyleOrderQuan>
                             </div>
                             
@@ -173,24 +176,232 @@ const PageLinkGroup = styled.a`
 class IndexComponent extends React.Component {
     state = {
         categorys: [],
-        selectedCat: ''
+        selectedCat: 1,
+        menuPerPage: 3,
+        page: [],
+        currentPage: 1,
+        menudata: [],
+        showmenu: [],
+        selectedList: []
     }
 
     componentWillMount = async () => {
+        window.onbeforeunload = () => {
+            if(this.state.selectedList.length > 0) {
+                return 'Are you sure you want to leave?'
+            }
+        }
+        // return null if that's not defined
+        let bill = JSON.parse(localStorage.getItem('bill'))
+        if(bill == null) {
+            let result = await instance.post('/bill', {
+                branchId: 1
+            }).then(data => data.data)
+
+            // console.log(result)
+            localStorage.setItem('bill', JSON.stringify({
+                id: result.data.insertId
+            }))
+        }else {
+            // searching for bill
+            let billData = await instance.get(`/bill/${bill.id}`)
+                .then(resp => resp.data)
+            if(billData.data.length === 0) {
+                // console.log('empty data')
+            }
+        }
+
+
+        // localStorage.removeItem('scc-user')
+
         let data = await instance.get(`/category`)
             .then(resp => resp.data)
         if(data.status) {
             let cats = data.data
             this.setState({ 
                 categorys: cats,
-                selectedCat: cats[0].cateName
+                selectedCat: cats[0].cateId
             })
 
         }
+
+        data = await instance.get(`/menu/1`)
+            .then(resp => resp.data)
+        if(data.status) {
+            let rs = data.data
+            // console.log(rs)
+            // for find indx of page
+            let max = Math.ceil(rs.length / this.state.menuPerPage)
+            let page = []
+            for(let i = 0; i<max; i++){
+                page.push(i+1)
+            }
+
+            // show menu for index page
+            let currentP = this.state.currentPage
+            let menuPerP = this.state.menuPerPage
+            let showmenu = rs.filter((v, i) => i < currentP * menuPerP && i >= (currentP-1) * menuPerP)
+            // console.log(d)
+            this.setState({ 
+                showmenu,
+                page,
+                menudata: rs
+            })
+        }
     }
 
-    selectCat = (cat) => {
+    selectCat = async (cat) => {
+        if(this.state.selectedCat === cat){
+            return
+        }
+        console.log(cat)
+        let data = await instance.get(`/menu/${cat}`)
+            .then(resp => resp.data)
+        if(data.status) {
+            let rs = data.data
+            
+            // for find indx of page
+            let max = Math.ceil(rs.length / this.state.menuPerPage)
+            let page = []
+            for(let i = 0; i<max; i++){
+                page.push(i+1)
+            }
+
+            // show menu for index page
+            let currentP = 1
+            let menuPerP = this.state.menuPerPage
+            let showmenu = rs.filter((v, i) => i < currentP * menuPerP && i >= (currentP-1) * menuPerP)
+            
+            this.setState({ 
+                showmenu,
+                page,
+                menudata: rs,
+                currentPage: currentP
+            })
+        }
         this.setState({ selectedCat: cat })
+
+    }
+
+    addToList = (e) => {
+        let ListCart = this.state.selectedList
+        let index = ListCart.findIndex((v, i) => v.menuPriceId === e.menuPriceId )
+        if(index > -1){ // ถ้ามีข้อมูล
+            ListCart[index].quantity += 1
+        } else {
+            let product = {
+                ...e,
+                quantity: 1
+            }
+            ListCart.push(product)
+        }
+        this.setState({selectedList: ListCart})
+    }
+
+    editQuantity = (data, op) => {
+        console.log(data)
+        console.log(op)
+        switch(op) {
+            case '+': 
+                data.quantity += 1
+                break
+            case '-':
+                data.quantity -= 1
+                if(data.quantity === 0){
+                    let cart = this.state.selectedList
+                    let index = cart.findIndex((v, i) => data.menuPriceId === v.menuPriceId)
+                    cart.splice(index, 1)
+                }
+                break
+            default: ''
+        }
+        this.setState({})
+    }
+
+    changePage = (e) => {
+        let currentP = e
+        let menuPerP = this.state.menuPerPage
+        let all = this.state.menudata
+        let showmenu = all.filter((v, i) => i < currentP * menuPerP && i >= (currentP-1) * menuPerP)
+        this.setState({
+            currentPage: e,
+            showmenu
+        })
+    }
+
+    onSubmit = () => {
+        let billId = JSON.parse(localStorage.getItem('bill')).id
+        
+        swal({
+          title: 'Confirm orders',
+          html: `you have ${this.state.selectedList.length} orders`,
+          showCancelButton: true,
+          confirmButtonText: 'Confirm',
+          customClass: 'Button',
+          showLoaderOnConfirm: true,
+          preConfirm: () => {
+            return new Promise((resolve, reject) => {
+              let result = {status: true}
+              console.log()
+              this.state.selectedList.map(async (d, i) => {
+                // create Orders
+                result = await instance.post('/order', {
+                  tableId: 1,
+                  billId: billId,
+                  orderStatus: 'prepared'
+                }).then(data => data.data)
+                
+                console.log(result)
+                // after Orders created
+                // create OrderMenu
+                let new_orderId = result.data.insertId
+                let menuPriceId = d.menuPriceId
+                let price_perpiece = d.price
+                let quantity = d.quantity
+
+                console.log({
+                  new_orderId,
+                  menuPriceId,
+                  price_perpiece,
+                  quantity
+                })
+                let result2 = await instance.post('/ordermenu', {
+                  orderId: new_orderId,
+                  menuPriceId: menuPriceId,
+                  price: price_perpiece,
+                  quantity: quantity
+                })
+
+              })
+              resolve(result)
+            })
+          }
+        }).then((data) => {
+          
+          if (data.value.status) {
+            this.setState({selectedList: []})
+            swal({
+              title: 'Success',
+              html: `your order was created`,
+              type: 'success',
+              confirmButtonText: 'OK'
+            })
+          } else {
+            swal({
+              title: 'Cancel',
+              text: `Your order was not create.`,
+              type: 'warning',
+              confirmButtonText: 'OK'
+            })
+          }
+        })
+
+        
+        // console.log('on submit')
+    }
+
+    viewOrder = () => {
+        // console.log('view order')
     }
 
     render() {
@@ -199,126 +410,91 @@ class IndexComponent extends React.Component {
                 <CategoryBar cats={this.state.categorys} selCat={this.state.selectedCat} onClickCat={this.selectCat} />
                 <IdexContainer className='container-fluid'>
                     <div className="row justify-content-between">
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginLeft: '10px'
-                        }}>
-                            <button style={{
-                                display: 'inline-block',
-                                borderRadius: '50%',
-                                fontSize: '1.5em'
-                            }}><i className='fa fa-arrow-left'/></button>
-                        </div>
-                        <div className="col-8 " style={{ paddingTop: '10px'}}>
+                        
+                        <div className="col-9 " style={{ paddingTop: '10px'}}>
                             <PageLinkGroup style={{marginBottom: '5px'}}>
-                                <span className='page-item' style={{margin: '0 2px'}}>
-                                    <button className=" btn btn-secondary">1<span className="sr-only">(current)</span></button>
-                                </span>
-                                <span className='page-item' style={{margin: '0 2px'}}>
-                                    <button className=" btn btn-secondary">2<span className="sr-only">(current)</span></button>
-                                </span>
+                                {
+                                    this.state.page.map(e => (
+                                        <span key={e} className='page-item' style={{margin: '0 2px'}}>
+                                            <button 
+                                                className=" btn btn-secondary"
+                                                style={{ padding: '5px 10px', borderRadius: '50%', cursor: 'pointer'}}
+                                                onClick={() => this.changePage(e)}
+                                            >{e}<span className="sr-only" >(current)</span></button>
+                                        </span>
+
+                                    ))
+                                }
                             </PageLinkGroup>
                             <div className="row">
-                                <div className="col-4">
-                                    <CardContainer className="card" 
-                                    // style={{width: '100%'}}
-                                    >
-                                        <FixedIMG className="card-img-top" src="https://media1.s-nbcnews.com/j/newscms/2017_20/1215661/baked-chicken-today-170519-tease_15b214baba5431d761c7a46cf08e062c.today-inline-large.jpg" alt="Card image cap" />
-                                        <div className="card-body">
-                                            <h4 className="card-title">Menu title {this.state.selectedCat}</h4>
-                                            <p className="card-text">Some quick example.</p>
-                                            {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                                            <hr/>
-                                            <div className='size-block' style={{marginBottom: '10px'}}>
-                                                size:
-                                                <span className='float-right'>price</span>
+                                {
+                                    this.state.showmenu.map((v, i) => 
+                                        (
+                                            <div className="col-4" key={i} style={{transition: 'all .2s linear 0s'}}>
+                                                <CardContainer className="card" >
+                                                    <FixedIMG className="card-img-top" status={v.status} src={v.url} alt="Card image cap" />
+                                                    <div className="card-body" style={{position: 'relative'}}>
+                                                        <h4 className="card-title">{v.menuName} <b>({v.size})</b></h4>
+                                                        {
+                                                            v.status === 0 && (
+                                                                <span className='card-text text-danger'>สินค้าหมด</span>
+                                                            )
+                                                        }
+                                                        <hr/>
+                                                        <div style={{position: 'absolute', bottom: '10%', width: '85%'}}>
+                                                            
+                                                            
+                                                            {
+                                                                v.status === 0 ? (
+                                                                    <button 
+                                                                        className={`btn btn-block btn-secondary text-center disabled`} 
+                                                                        disabled={true}
+                                                                    >
+                                                                        <span >{`${v.price} $`}</span>
+                                                                    </button>
+                                                                ) : (
+                                                                    <div>
+                                                                        <div className='size-block' style={{marginBottom: '10px'}}>
+                                                                            price:
+                                                                        </div>
+                                                                        <button 
+                                                                            className={`btn btn-block btn-warning text-center`} 
+                                                                            style={{cursor: 'pointer'}}
+                                                                            onClick={() => this.addToList(v)}
+                                                                        >
+                                                                            <span >{`${v.price} $`}</span>
+                                                                        </button>
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </CardContainer>
                                             </div>
-                                            <button className='btn btn-block btn-warning text-left'>
-                                                S
-                                                <span className='float-right'>100 $</span>
-                                            </button>
-                                            <button className='btn btn-block btn-warning text-left'>
-                                                M
-                                                <span className='float-right'>200 $</span>
-                                            </button>
-                                            <button className='btn btn-block btn-warning text-left'>
-                                                L
-                                                <span className='float-right'>300 $</span>
-                                            </button>
-                                        </div>
-                                    </CardContainer>
-                                </div>
-                                <div className="col-4">
-                                    <CardContainer className="card" 
-                                    // style={{width: '100%'}}
-                                    >
-                                        <FixedIMG className="card-img-top" src="https://budgetbytes.com/wp-content/uploads/2016/07/Cook-Chicken-in-Skillet.jpg" alt="Card image cap" />
-                                        <div className="card-body">
-                                            <h4 className="card-title">Menu title</h4>
-                                            <p className="card-text">Some quick example.</p>
-                                            {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                                            <hr/>
-                                            <div className='size-block' style={{marginBottom: '10px'}}>
-                                                size:
-                                                <span className='float-right'>price</span>
-                                            </div>
-                                            <button className='btn btn-block btn-warning text-left'>
-                                                R
-                                                <span className='float-right'>250 $</span>
-                                            </button>
-                                        </div>
-                                    </CardContainer>
-                                </div>
-                                <div className="col-4">
-                                    <CardContainer className="card" 
-                                    // style={{width: '100%'}}
-                                    >
-                                    
-                                                  
-                                        <FixedIMG className="card-img-top" src="https://www.sciencedaily.com/images/2017/05/170502204556_1_900x600.jpg" alt="Card image cap" style={{objectFit: 'contain'}}/>
-                                        <div className="card-body">
-                                            <h4 className="card-title">Menu title</h4>
-                                            <p className="card-text">Some quick example.</p>
-                                            {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                                            <hr/>
-                                            <div className='size-block' style={{marginBottom: '10px'}}>
-                                                size:
-                                                <span className='float-right'>price</span>
-                                            </div>
-                                            <button className='btn btn-block disabled btn-warning text-left'>
-                                                S
-                                                <span className='float-right'>250 $</span>
-                                            </button>
-                                            <button className='btn btn-block btn-warning text-left'>
-                                                M
-                                                <span className='float-right'>500 $</span>
-                                            </button>
-                                        </div>
-                                    </CardContainer>
-                                </div>
+                                        ))
+                                }
+                                
                             </div>
-                        </div>
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }}>
-                            <button style={{
-                                display: 'inline-block',
-                                borderRadius: '50%',
-                                fontSize: '1.5em'
-                            }}><i className='fa fa-arrow-right'/></button>
                         </div>
 
                         <div className="col-3">
                             <OrderList>
-                                {/* <EmptyOrderList /> */}
-                                <FillOrderList />
+                                {
+                                    this.state.selectedList.length === 0 ? (
+                                        <EmptyOrderList />
+                                    ) : (
+                                        <FillOrderList cartList={this.state.selectedList} editQ={this.editQuantity} />
+                                    )
+                                }
                                 <OrderGroupBtn>
-                                    <button className='btn btn-success btn-block'>สั่งอาหารทันที</button>
-                                    <button className='btn btn-danger btn-block'>ดูรายการที่สั่ง</button>
+                                    <button 
+                                        className='btn btn-success btn-block'
+                                        onClick={this.onSubmit}
+                                    >สั่งอาหารทันที</button>
+                                    <button 
+                                        className='btn btn-danger btn-block'
+                                        onClick={this.viewOrder}
+                                    >ดูรายการที่สั่ง</button>
                                 </OrderGroupBtn>
                             </OrderList>
                         </div>

@@ -2,8 +2,8 @@ module.exports = (con, resSQL_err) => ({
     getAll: async (req, res) => {    
         con.query(
             `
-            SELECT * 
-            FROM MenuCategory;
+            SELECT *
+            FROM Tables;
             `, 
         (err, result, fields) => {
         if (err) res.json(resSQL_err)
@@ -14,20 +14,22 @@ module.exports = (con, resSQL_err) => ({
             }
         )
     },
-    getData: async (req, res) => {
-        // let query = "INSERT INTO `Test`(`time`, `date`) VALUES (@time, @date)"
+    create: async (req, res) => {    
+        let tableNo = req.body.tableNumber
+        let branchId = req.body.branchId
         con.query(
             `
-            SELECT * 
-            FROM Test;
-            `, 
-            (err, result, fields) => {
-                if (err) res.json(resSQL_err)
+            INSERT INTO Tables
+            (tableNumber, branchId)
+            VALUES (${tableNo}, ${branchId})
+            `,
+        (err, result, fields) => {
+        if (err) res.json(resSQL_err)
                 res.json({
                     status: true,
                     data: result
                 })
             }
         )
-    }
+    },
 })

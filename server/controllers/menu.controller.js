@@ -2,8 +2,10 @@ module.exports = (con, resSQL_err) => ({
     getAll: async (req, res) => {    
         con.query(
             `
-            SELECT * 
-            FROM MenuCategory;
+            SELECT *
+            FROM Menu m
+            JOIN MenuPrice mp
+            ON m.menuId = mp.menuId;
             `, 
         (err, result, fields) => {
         if (err) res.json(resSQL_err)
@@ -14,15 +16,18 @@ module.exports = (con, resSQL_err) => ({
             }
         )
     },
-    getData: async (req, res) => {
-        // let query = "INSERT INTO `Test`(`time`, `date`) VALUES (@time, @date)"
+    getByCatId: async (req, res) => {    
+        cateId = req.params.catid
         con.query(
             `
             SELECT * 
-            FROM Test;
+            FROM Menu m
+            JOIN MenuPrice mp
+            ON m.menuId = mp.menuId
+            WHERE m.cateId = ${cateId};
             `, 
-            (err, result, fields) => {
-                if (err) res.json(resSQL_err)
+        (err, result, fields) => {
+        if (err) res.json(resSQL_err)
                 res.json({
                     status: true,
                     data: result
