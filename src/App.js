@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { withRouter , Route, Switch } from 'react-router-dom'
 import { injectGlobal } from 'styled-components'
 
-import Index from './container/user'
-import Orderlist from './container/user/orderlist'
+// import Index from './container/user'
+// import Orderlist from './container/user/orderlist'
+// import CheckBill from './container/user/checkbill'
+
+import UserGroup from './container/user/userpage'
 
 // import static css
 import './static/css/bootstrap.min.css'
@@ -37,14 +40,18 @@ injectGlobal`
 `
 
 class App extends Component {
+
   render = () => (
-    <Router>
+    <div>
       <Switch>
-        <Route exact path='/' component={Index} />
-        <Route path='/orderlist' component={Orderlist} />
+        {/* <Route path='' component={() => (<div>test</div>)} /> */}
+        <Route path='/' component={UserGroup} />
+        <Route exact path='/' component={UserGroup} />
+        {/* <Route path='/orderlist' component={Orderlist} />
+        <Route path='/checkbill' component={CheckBill} /> */}
       </Switch>
-    </Router>
+    </div>
   )
 }
 
-export default App;
+export default withRouter(App)

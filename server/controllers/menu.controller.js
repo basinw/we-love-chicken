@@ -44,7 +44,7 @@ module.exports = (con, resSQL_err) => ({
             JOIN MenuSize ms
             ON ms.sizeId = mp.sizeId
             WHERE m.cateId = ${cateId}
-            ORDER BY lower(m.menuName);
+            ORDER BY mp.status DESC, lower(m.menuName), mp.sizeId;
             `, 
         (err, result, fields) => {
         if (err) res.json(resSQL_err)

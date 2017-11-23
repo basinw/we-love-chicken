@@ -1,25 +1,73 @@
 import React from 'react'
 import styled from 'styled-components'
 import instance from '../libs/axios'
+import { Link } from 'react-router-dom'
 
 const HeaderBar = styled.div`
     height: 7vh;
     background: #fff;
     padding: 20px auto;
+    padding-top: 12px;
+    position: relative;
+    display: flex;
+    & > div {
+        font-weight: bold;
+        bottom: 0;
+        border-bottom: 1px solid black;
+    }
+    &  div {
+        border-right: 1px solid #000;
+
+    }
 `
 
 const Body = styled.div`
     height: 73vh;
-    background: purple;
+    background: #c9ffd6;
     color: #fff;
-    
+`
+
+const TR = styled.div`
+    border-bottom: 1px solid #aaa;
+    color: #000;
+    & div {
+        text-align: center;
+        border-right: .5px solid #ddd;
+    }
+`
+
+const Tbody = styled.div`
+    height: 57vh;
+    background: #fff;
+    overflow-y: scroll;
+    user-select: none;
+    ::-webkit-scrollbar {
+        width: .5em;
+        height: 2em
+    }
+    /* ::-webkit-scrollbar-button {
+        background: #ccc
+    } */
+     ::-webkit-scrollbar-track-piece {
+        background: yellow;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: green;
+    }
+`
+
+const GroupBtn = styled.div`
+    margin-top: 1.5em;
+`
+
+// order status
+const Status = styled.div`
+    color: ${props => props.status === 'prepared' ? 'green':'#da8400'};
+    /* //  */
 `
 class UserOrderlist extends React.Component {
     state = {
-        time: '',
-        date: '',
-        name: 'asdf',
-        now: '1234'
+        orders: []
     }
     componentWillMount = async () => {
         let billid = JSON.parse(localStorage.getItem('bill')).id
@@ -27,9 +75,8 @@ class UserOrderlist extends React.Component {
             .then(resp => resp.data)
         if(orders.status){
             orders = orders.data
-            console.log(orders)
+            this.setState({orders})
         }
-        // console.log(bill)
         // let billId = bill.
 
         
@@ -62,15 +109,43 @@ class UserOrderlist extends React.Component {
 
     render = () => (
         <div>
-            <HeaderBar />
-            <Body className='container-fluid'>
-                {this.state.now}
-                <form onSubmit={this.onSubmit}>
-                    <input type="date" value={this.state.date} onChange={(e) => this.setState({date: e.target.value})} id={`date`}/>
-                    <input type="time" value={this.state.time} onChange={(e) => this.setState({time: e.target.value})}/>
-                    <button>submit</button>
-                </form>
-                user orderlist
+            <HeaderBar>
+                <div className="container">
+                    <div className="row text-center">
+                        <div className="col-1">#</div>
+                        <div className="col-2">status</div>
+                        <div className="col-7">menu</div>
+                        <div className="col-1">quantity</div>
+                        <div className="col-1">price</div>
+                    </div>
+                </div>
+
+            </HeaderBar>
+            <Body>
+                <Tbody className='container'>
+                    {this.state.orders.map((v, i) => (
+                        <TR className='row' key={i}>
+                            <div className="col-1"><b>{i+1}</b></div>
+                            <Status className="col-2" status={v.orderStatus}>
+                                <i className={`fa fa-${v.orderStatus === 'prepared' ? 'bars':'check-circle'}`}/> &nbsp;
+                                {v.orderStatus}
+                            </Status>
+                            <div className="col-7 text-left">{v.menuName} ({v.sizeName})</div>
+                            <div className="col-1">{v.quantity}</div>
+                            <div className="col-1 text-right">{(v.quantity*v.price).toLocaleString()}</div>
+                        </TR>
+                    ))}
+                </Tbody>
+                <GroupBtn className='container'>
+                    <div className="row justify-content-center">
+                        <div className="col-2">
+                            <Link to='/' className='btn-block btn btn-warning'>HOME</Link>
+                        </div>
+                        <div className="col-2">
+                            <Link to='/check-bill' className='btn-block btn btn-danger'>BILL</Link>
+                        </div>
+                    </div>
+                </GroupBtn>
             </Body>
         </div>
     )

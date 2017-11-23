@@ -3,9 +3,13 @@ import styled from 'styled-components'
 import instance from '../libs/axios'
 import swal from 'sweetalert2'
 
+import { Link } from 'react-router-dom'
+
+import howTo from '../static/img/how-2.png'
+
 const IdexContainer = styled.div`
     height: 73vh;
-    background: aqua;
+    background: #c1b482;
 `
 
 const OrderList = styled.div`
@@ -27,6 +31,10 @@ const OrderGroupBtn = styled.div`
     left: 0;
     bottom: 0;
     padding: 0 20px;
+
+    & button {
+        cursor: pointer
+    }
 `
 
 const CardContainer = styled.div`
@@ -91,9 +99,9 @@ const EmptyOrderList = props => (
         ยังไม่มีรายการอาหารที่จะสั่ง
         <hr/>
         กรุณากด <br/>
-        img <br/>
-        รูปภาพอาหารเพื่อเริ่มต้น<br/>
-        การสั่งอาหาร
+        <img src={howTo} alt='how-to-use' />
+        เมนูทางด้านซ้าย<br/>
+        เพื่อเริ่มต้นการสั่งอาหาร
         <hr/>
     </div>
 )
@@ -392,10 +400,6 @@ class IndexComponent extends React.Component {
         // console.log('on submit')
     }
 
-    viewOrder = () => {
-        // console.log('view order')
-    }
-
     render() {
         return(
             <div>
@@ -409,7 +413,7 @@ class IndexComponent extends React.Component {
                                     this.state.page.map(e => (
                                         <span key={e} className='page-item' style={{margin: '0 2px'}}>
                                             <button 
-                                                className=" btn btn-secondary"
+                                                className=" btn btn-dark"
                                                 style={{ padding: '5px 10px', borderRadius: '50%', cursor: 'pointer'}}
                                                 onClick={() => this.changePage(e)}
                                             >{e}<span className="sr-only" >(current)</span></button>
@@ -484,10 +488,12 @@ class IndexComponent extends React.Component {
                                         onClick={this.onSubmit}
                                         disabled={this.state.selectedList.length === 0}
                                     >สั่งอาหารทันที</button>
-                                    <button 
+                                    <Link 
+                                        to={`/orderlist`}
                                         className='btn btn-danger btn-block'
-                                        onClick={this.viewOrder}
-                                    >ดูรายการที่สั่ง</button>
+                                    >
+                                        ดูรายการที่สั่ง
+                                    </Link>
                                 </OrderGroupBtn>
                             </OrderList>
                         </div>

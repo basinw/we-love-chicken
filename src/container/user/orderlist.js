@@ -1,11 +1,23 @@
 import React from 'react'
-import Header from '../../components/Header'
 import UserOrderlist from '../../components/user_orderlist'
-const Orderlist = () => (
-    <div>
-        <Header />
-        <UserOrderlist />
-    </div>
-)
+
+// import instance from '../../libs/axios'
+class Orderlist extends React.Component {
+    state = {
+        
+    }
+
+    componentWillMount = () => {
+    }
+    render = () => {
+        return this.state.branch === {} ? (
+            <div style={{display: 'flex', width: '100vw', height: '100vh', justifyContent: 'center', alignItems: 'center'}}>
+                Loading . . . 
+            </div>
+        ) : (
+            <UserOrderlist />
+        )
+    }
+}
 
 export default Orderlist

@@ -122,7 +122,13 @@ module.exports = (con, resSQL_err) => ({
             SELECT * FROM Orders o
             JOIN Bill b
             ON b.billId = o.billId
-            WHERE b.billId = ${id}
+            JOIN MenuPrice mp 
+            ON mp.menuPriceId = o.menuPriceId
+            JOIN Menu m 
+            ON m.menuId = mp.menuId
+            JOIN MenuSize ms 
+            ON ms.sizeId = mp.sizeId
+            WHERE b.billId = ${id};
             `,
         (err, result, fields) => {
         if (err) res.json(resSQL_err)

@@ -47,8 +47,10 @@ if (process.env.NODE_ENV === 'PRODUCTION') {
     })
 }
 
-// LISTEN PORT 3000
-const port = 3001
+var port = 3001
+if (process.env.PORT !== undefined){
+    port = process.env.PORT
+}
 var app = server.listen(port, (err) => {
     if (err) throw err
     console.log(`> Ready on http://localhost:${port}`)
