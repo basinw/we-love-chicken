@@ -4,6 +4,7 @@ require('dotenv').config()
 //   IMPORT DEPENDENCIES
 // -----------------------
 const express = require('express')
+require('express-group-routes')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const cors = require('cors')

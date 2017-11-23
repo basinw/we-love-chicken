@@ -3,7 +3,7 @@ module.exports = (con, resSQL_err) => ({
         con.query(
             `
             SELECT * 
-            FROM MenuCategory;
+            FROM StaffPosition;
             `, 
         (err, result, fields) => {
         if (err) res.json(resSQL_err)
@@ -19,8 +19,8 @@ module.exports = (con, resSQL_err) => ({
         con.query(
             `
             SELECT * 
-            FROM MenuCategory
-            WHERE cateId = ${id};
+            FROM StaffPosition
+            WHERE posId = ${id};
             `, 
             (err, result, fields) => {
                 if (err) res.json(resSQL_err)
@@ -32,12 +32,12 @@ module.exports = (con, resSQL_err) => ({
         )
     },
     create: (req, res) => {
-        let cateName = req.body.cateName
-        if (cateName !== undefined) {
+        let positionName = req.body.posName
+        if (positionName !== undefined) {
             con.query(
                 `
-                INSERT INTO MenuCategory(cateName) 
-                VALUES ('${cateName}');
+                INSERT INTO StaffPosition(posName) 
+                VALUES ('${positionName}');
                 `, 
             (err, result, fields) => {
             if (err) res.json(resSQL_err)
@@ -55,14 +55,14 @@ module.exports = (con, resSQL_err) => ({
         }
     },
     update: (req, res) => {
-        let cateName = req.body.cateName
-        let cateId = req.params.id
-        if (cateName !== undefined) {
+        let positionName = req.body.posName
+        let posId = req.params.id
+        if (positionName !== undefined) {
             con.query(
                 `
-                UPDATE MenuCategory SET 
-                cateName = '${cateName}' 
-                WHERE cateId = ${cateId}
+                UPDATE StaffPosition SET 
+                    posName='${positionName}' 
+                WHERE posId=${posId};
                 `, 
             (err, result, fields) => {
             if (err) res.json(resSQL_err)
@@ -79,12 +79,12 @@ module.exports = (con, resSQL_err) => ({
             })
         }
     },
-    deleteById: (req, res) => {
-        let cateId = req.params.id
+    delete: (req, res) => {
+        let positionId = req.params.id
         con.query(
             `
-            DELETE FROM MenuCategory 
-            WHERE cateId = ${cateId};
+            DELETE FROM StaffPosition 
+            WHERE posId = ${positionId};
             `, 
         (err, result, fields) => {
         if (err) res.json(resSQL_err)

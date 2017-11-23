@@ -143,7 +143,7 @@ const FillOrderList = props => (
                     <div key={i} style={{ minHeight: '50px' }}>
                         <div className="row">
                             <div className="col-7 no-pad-r text-left" style={{paddingTop: '0px'}}>
-                                {v.menuName} ({v.size})
+                                {v.menuName} ({v.sizeName})
                             </div>
                             <div className="col-5 no-pad-a text-center">
                                 <StyleOrderQuan
@@ -182,7 +182,9 @@ class IndexComponent extends React.Component {
         currentPage: 1,
         menudata: [],
         showmenu: [],
-        selectedList: []
+        selectedList: [],
+        tableNo: 1,
+        branch: {}
     }
 
     componentWillMount = async () => {
@@ -225,7 +227,7 @@ class IndexComponent extends React.Component {
 
         }
 
-        data = await instance.get(`/menu/1`)
+        data = await instance.get(`/menu/cate/1`)
             .then(resp => resp.data)
         if(data.status) {
             let rs = data.data
@@ -254,8 +256,8 @@ class IndexComponent extends React.Component {
         if(this.state.selectedCat === cat){
             return
         }
-        console.log(cat)
-        let data = await instance.get(`/menu/${cat}`)
+        // console.log(cat)
+        let data = await instance.get(`/menu/cate/${cat}`)
             .then(resp => resp.data)
         if(data.status) {
             let rs = data.data
@@ -283,9 +285,15 @@ class IndexComponent extends React.Component {
 
     }
 
-    addToList = (e) => {
+    addToList = async (e) => {
         let ListCart = this.state.selectedList
         let index = ListCart.findIndex((v, i) => v.menuPriceId === e.menuPriceId )
+        // console.log(e)
+        if (e.serveWithId !== null) {
+        //   let result = await instance.get(`/menu/servewith/${e.menuId}`)
+            // .then(resp => resp.data)
+        //   console.log(result)
+        }
         if(index > -1){ // ถ้ามีข้อมูล
             ListCart[index].quantity += 1
         } else {
@@ -299,8 +307,8 @@ class IndexComponent extends React.Component {
     }
 
     editQuantity = (data, op) => {
-        console.log(data)
-        console.log(op)
+        // console.log(data)
+        // console.log(op)
         switch(op) {
             case '+': 
                 data.quantity += 1
@@ -313,6 +321,7 @@ class IndexComponent extends React.Component {
                     cart.splice(index, 1)
                 }
                 break
+            // eslint-disable-next-line
             default: ''
         }
         this.setState({})
@@ -341,44 +350,27 @@ class IndexComponent extends React.Component {
           showLoaderOnConfirm: true,
           preConfirm: () => {
             return new Promise((resolve, reject) => {
-              let result = {status: true}
-              console.log()
+              let result// = {status: true}
               this.state.selectedList.map(async (d, i) => {
-                // create Orders
                 result = await instance.post('/order', {
-                  tableId: 1,
+                  tableId: this.state.tableNo,
                   billId: billId,
-                  orderStatus: 'prepared'
-                }).then(data => data.data)
-                
-                console.log(result)
-                // after Orders created
-                // create OrderMenu
-                let new_orderId = result.data.insertId
-                let menuPriceId = d.menuPriceId
-                let price_perpiece = d.price
-                let quantity = d.quantity
-
-                console.log({
-                  new_orderId,
-                  menuPriceId,
-                  price_perpiece,
-                  quantity
+                  orderStatus: 'prepared',
+                  menupriceId: d.menuPriceId,
+                  price: d.price,
+                  quantity: d.quantity
                 })
-                let result2 = await instance.post('/ordermenu', {
-                  orderId: new_orderId,
-                  menuPriceId: menuPriceId,
-                  price: price_perpiece,
-                  quantity: quantity
-                })
-
               })
               resolve(result)
             })
           }
         }).then((data) => {
+        //   console.log(data)
+          if(data.dismiss !== undefined){
+            return
+          }
           
-          if (data.value.status) {
+          if (data.value) {
             this.setState({selectedList: []})
             swal({
               title: 'Success',
@@ -434,7 +426,7 @@ class IndexComponent extends React.Component {
                                                 <CardContainer className="card" >
                                                     <FixedIMG className="card-img-top" status={v.status} src={v.url} alt="Card image cap" />
                                                     <div className="card-body" style={{position: 'relative'}}>
-                                                        <h4 className="card-title">{v.menuName} <b>({v.size})</b></h4>
+                                                        <h4 className="card-title">{v.menuName} <b>({v.sizeName})</b></h4>
                                                         {
                                                             v.status === 0 && (
                                                                 <span className='card-text text-danger'>สินค้าหมด</span>
@@ -490,6 +482,7 @@ class IndexComponent extends React.Component {
                                     <button 
                                         className='btn btn-success btn-block'
                                         onClick={this.onSubmit}
+                                        disabled={this.state.selectedList.length === 0}
                                     >สั่งอาหารทันที</button>
                                     <button 
                                         className='btn btn-danger btn-block'

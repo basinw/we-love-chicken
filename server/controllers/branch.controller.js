@@ -14,21 +14,53 @@ module.exports = (con, resSQL_err) => ({
             }
         )
     },
+    getById: async (req, res) => {    
+        let id = req.params.id
+        if(!isNaN(id)){
+            con.query(
+                `
+                SELECT * 
+                FROM Branch
+                WHERE branchId = ${id};
+                `, 
+            (err, result, fields) => {
+            if (err) res.json(resSQL_err)
+                    res.json({
+                        status: true,
+                        data: result
+                    })
+                }
+            )
+        } else {
+            res.json({
+                status: false,
+                data: 'invalid number'
+            })
+        }
+    },
     create: async (req, res) => {    
         let branchName = req.body.branchName
         let address = req.body.address
         let district = req.body.district
         let province = req.body.province
         let telNo = req.body.telNo
+        
+        let openTime = '00:00'
+        let closeTime = '00:00' 
+        if(req.body.openTime !== undefined){
+            openTime = req.body.openTime
+        }
+        if(req.body.closeTime !== undefined){
+            closeTime = req.body.closeTime
+        }
         if(branchName !== undefined && address !== undefined &&
             district !== undefined && province !== undefined &&
             telNo !== undefined){
 
             con.query(
                 `
-                INSERT INTO Branch
-                (branchName, address, district, province, telNo) 
-                VALUES ('${branchName}', '${address}', '${district}', '${province}', '${telNo}' );
+                INSERT INTO Branch(branchName, openTime, closeTime, address, district, province, telNo) 
+                VALUES ('${branchName}', '${openTime}', '${closeTime}', '${address}', '${district}', '${province}', '${telNo}');
                 `, 
             (err, result, fields) => {
             if (err) res.json(resSQL_err)
@@ -44,5 +76,76 @@ module.exports = (con, resSQL_err) => ({
                 data: 'information not found'
             })
         }
+    },
+    update: (req, res) => {
+        let branchId = req.params.id
+        let branchName = req.body.branchName
+        let address = req.body.address
+        let district = req.body.district
+        let province = req.body.province
+        let telNo = req.body.telNo
+        let openTime = req.body.openTime
+        let closeTime = req.body.closeTime
+        if(branchName !== undefined && address !== undefined &&
+            district !== undefined && province !== undefined &&
+            telNo !== undefined && openTime !== undefined &&
+            closeTime !== undefined){
+
+            con.query(
+                `
+                UPDATE Branch SET 
+                    branchName='${branchName}',
+                    openTime='${openTime}',
+                    closeTime='${closeTime}',
+                    address='${address}',
+                    district='${district}',
+                    province='${province}',
+                    telNo='${telNo}' 
+                WHERE branchId=${branchId};
+                `, 
+            (err, result, fields) => {
+            if (err) res.json(resSQL_err)
+                    res.json({
+                        status: true,
+                        data: result
+                    })
+                }
+            )
+        }else{
+            res.json({
+                status: false,
+                data: 'information not found'
+            })
+        }
+    },
+    delete: (req, res) => {
+        let branchId = req.params.id
+        con.query(
+            `
+            DELETE FROM Branch 
+            WHERE branchId = ${branchId};
+            `, 
+        (err, result, fields) => {
+        if (err) res.json(resSQL_err)
+                res.json({
+                    status: true,
+                    data: result
+                })
+            }
+        )
+    },
+    test: (req, res) => {
+        con.query(
+            `
+            SELECT current_timestamp();
+            `, 
+        (err, result, fields) => {
+        if (err) res.json(resSQL_err)
+                res.json({
+                    status: true,
+                    data: result
+                })
+            }
+        )
     }
 })

@@ -1,11 +1,26 @@
 import React from 'react'
 import Header from '../../components/Header'
-import IndexPage from "../../components/indexPage";
-const Index = () => (
-    <div>
-        <Header />
-        <IndexPage />
-    </div>
-)
+import IndexPage from '../../components/indexPage'
 
-export default Index
+class IndexContainer extends React.Component {
+    componentWillMount = () => {
+        
+    }
+    
+    render = () => {
+        return (
+            <div>
+                <Header />
+                <IndexPage />
+            </div>
+        )    
+    }
+}
+// const Index = () => (
+//     <div>
+//         <Header />
+//         <IndexPage />
+//     </div>
+// )
+
+export default IndexContainer

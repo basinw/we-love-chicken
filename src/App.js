@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
-import Index from './container/user'
 import { injectGlobal } from 'styled-components'
+
+import Index from './container/user'
+import Orderlist from './container/user/orderlist'
 
 // import static css
 import './static/css/bootstrap.min.css'
@@ -39,6 +41,7 @@ class App extends Component {
     <Router>
       <Switch>
         <Route exact path='/' component={Index} />
+        <Route path='/orderlist' component={Orderlist} />
       </Switch>
     </Router>
   )

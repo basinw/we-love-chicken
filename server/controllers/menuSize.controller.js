@@ -3,7 +3,7 @@ module.exports = (con, resSQL_err) => ({
         con.query(
             `
             SELECT * 
-            FROM MenuCategory;
+            FROM MenuSize;
             `, 
         (err, result, fields) => {
         if (err) res.json(resSQL_err)
@@ -19,8 +19,8 @@ module.exports = (con, resSQL_err) => ({
         con.query(
             `
             SELECT * 
-            FROM MenuCategory
-            WHERE cateId = ${id};
+            FROM MenuSize
+            WHERE sizeId = ${id};
             `, 
             (err, result, fields) => {
                 if (err) res.json(resSQL_err)
@@ -32,12 +32,13 @@ module.exports = (con, resSQL_err) => ({
         )
     },
     create: (req, res) => {
-        let cateName = req.body.cateName
-        if (cateName !== undefined) {
+        let sizeName = req.body.sizeName
+        let description = req.body.desc
+        if (sizeName !== undefined && description !== undefined) {
             con.query(
                 `
-                INSERT INTO MenuCategory(cateName) 
-                VALUES ('${cateName}');
+                INSERT INTO MenuSize(sizeName, description) 
+                VALUES ('${sizeName}', '${description}');
                 `, 
             (err, result, fields) => {
             if (err) res.json(resSQL_err)
@@ -55,14 +56,16 @@ module.exports = (con, resSQL_err) => ({
         }
     },
     update: (req, res) => {
-        let cateName = req.body.cateName
-        let cateId = req.params.id
-        if (cateName !== undefined) {
+        let sizeId = req.params.id
+        let sizeName = req.body.sizeName
+        let description = req.body.desc
+        if (sizeName !== undefined && description !== undefined) {
             con.query(
                 `
-                UPDATE MenuCategory SET 
-                cateName = '${cateName}' 
-                WHERE cateId = ${cateId}
+                UPDATE MenuSize SET 
+                    sizeName='${sizeName}',
+                    description='${description}' 
+                WHERE sizeId=${sizeId};
                 `, 
             (err, result, fields) => {
             if (err) res.json(resSQL_err)
@@ -79,12 +82,12 @@ module.exports = (con, resSQL_err) => ({
             })
         }
     },
-    deleteById: (req, res) => {
-        let cateId = req.params.id
+    delete: (req, res) => {
+        let sizeId = req.params.id
         con.query(
             `
-            DELETE FROM MenuCategory 
-            WHERE cateId = ${cateId};
+            DELETE FROM MenuSize 
+            WHERE sizeId = ${sizeId};
             `, 
         (err, result, fields) => {
         if (err) res.json(resSQL_err)
