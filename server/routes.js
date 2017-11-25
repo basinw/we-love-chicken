@@ -166,6 +166,7 @@ module.exports = (express, connection) => {
     tableRouter.route('/').get(TableController.getAll)
     tableRouter.route('/').post(TableController.create)
     tableRouter.route('/:id').get(TableController.getById)
+    tableRouter.route('/:id/order').get(TableController.getOrder)
     tableRouter.route('/:id').put(TableController.update)
     tableRouter.route('/:id').delete(TableController.delete)
 

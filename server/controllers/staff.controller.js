@@ -19,7 +19,11 @@ module.exports = (con, resSQL_err) => ({
     con.query(
       `
             SELECT * 
-            FROM Staff
+            FROM Staff s
+            JOIN StaffPosition sp
+            ON s.positionId = sp.posId
+            JOIN Branch b
+            ON b.branchId = s.branchId
             WHERE staffId = ${id};
             `,
       (err, result, fields) => {

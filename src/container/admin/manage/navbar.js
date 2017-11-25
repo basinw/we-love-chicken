@@ -36,7 +36,12 @@ class Nav extends React.Component {
 
   render = () => (
     <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top navbar-dark bg-dark">
-      <span className="navbar-brand">CHICKEN</span>
+      <span
+        className="navbar-brand"
+        onClick={() => this.props.history.push('/')}
+      >
+        CHICKEN
+      </span>
       <button
         className="navbar-toggler"
         type="button"
