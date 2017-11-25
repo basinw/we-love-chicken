@@ -121,20 +121,21 @@ module.exports = (con, resSQL_err) => ({
     let id = req.params.id
     con.query(
       `
-        SELECT *, o.price 'orderPrice' FROM 
-        Tables t
-        JOIN Orders o
-        ON o.tableId = t.tableId
-        JOIN Bill b
-        ON b.billId = o.billId
-        JOIN MenuPrice mp 
-        ON mp.menuPriceId = o.menuPriceId
-        JOIN Menu m
-        ON m.menuId = mp.menuId
-        JOIN MenuSize ms 
-        ON ms.sizeId = mp.sizeId
-        WHERE t.tableId = ${id}
-        AND b.staffId is not null;
+      SELECT *, o.price 'orderPrice' FROM 
+      Tables t
+      JOIN Orders o
+      ON o.tableId = t.tableId
+      JOIN Bill b
+      ON b.billId = o.billId
+      JOIN MenuPrice mp 
+      ON mp.menuPriceId = o.menuPriceId
+      JOIN Menu m
+      ON m.menuId = mp.menuId
+      JOIN MenuSize ms 
+      ON ms.sizeId = mp.sizeId
+      WHERE t.tableId = ${id}
+      AND b.staffId is null
+      ORDER BY o.orderId DESC;
         `,
       (err, result, fields) => {
         if (err) res.json(resSQL_err)

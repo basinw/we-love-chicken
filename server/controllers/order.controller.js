@@ -97,7 +97,6 @@ module.exports = (con, resSQL_err) => ({
                 `,
         (err, result, fields) => {
           if (err) res.json(resSQL_err)
-          console.log(result)
           res.json({
             status: true,
             data: result
