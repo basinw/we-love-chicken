@@ -126,5 +126,65 @@ module.exports = (con, resSQL_err) => ({
             }
         )
 
+    },
+    billtotal: (req, res) => {
+        let id = req.params.id
+        let data = {}
+        con.query(
+            `
+            SELECT m.menuName, o.menuPriceId, SUM(o.quantity) 'sumQuantity', o.price, o.price * SUM(o.quantity) 'orderPrice', ms.sizeName FROM Bill b
+            JOIN Orders o
+            ON o.billId = b.billId
+            JOIN MenuPrice mp
+            ON mp.menuPriceId = o.menuPriceId
+            JOIN Menu m
+            ON m.menuId = mp.menuId
+            JOIN MenuSize ms
+            ON ms.sizeId = mp.sizeId
+            WHERE b.billId = ${id}
+            GROUP BY o.menuPriceId
+            ORDER BY o.orderId;
+
+            `, 
+            (err, result, fields) => {
+                if (err) {res.json(resSQL_err); throw err}
+                    data = {
+                        summaryOrder: [
+                            ...result
+                        ]
+                    }
+                }
+            )
+            
+        con.query(
+            `
+            SELECT sum(o.price * o.quantity) 'totalPrice', sum(o.quantity) 'totalQuantity', CONCAT(s.fName, ' ', s.lName) 'staffName',
+            br.branchName, CONCAT(br.address, ', ', br.district, ', ', br.province) 'address',
+            b.timeStamp, br.telNo, b.return, b.cash 
+            FROM Bill b 
+            JOIN Orders o 
+            ON o.billId = b.billId 
+            JOIN Staff s
+            ON s.staffId = b.staffId
+            JOIN Branch br
+            ON br.branchId = b.branchId
+            WHERE b.billId = ${id}
+            GROUP BY b.billId;
+
+            `, 
+            (err, result, fields) => {
+        if (err) {res.json(resSQL_err); throw err}
+                data = {
+                    ...data,
+                    bill: {
+                        ...result[0]
+                    }
+                }
+                res.json({
+                    status: true,
+                    data: data
+                })
+            }
+        )
     }
 })

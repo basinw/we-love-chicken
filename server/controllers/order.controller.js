@@ -119,7 +119,8 @@ module.exports = (con, resSQL_err) => ({
         let id = req.params.billid
         con.query(
             `
-            SELECT * FROM Orders o
+            SELECT o.orderStatus, m.menuName, ms.sizeName, o.quantity, o.price, o.price * o.quantity 'priceOrder'
+            FROM Orders o
             JOIN Bill b
             ON b.billId = o.billId
             JOIN MenuPrice mp 
@@ -128,7 +129,8 @@ module.exports = (con, resSQL_err) => ({
             ON m.menuId = mp.menuId
             JOIN MenuSize ms 
             ON ms.sizeId = mp.sizeId
-            WHERE b.billId = ${id};
+            WHERE b.billId = ${id}
+            ORDER BY o.orderId;
             `,
         (err, result, fields) => {
         if (err) res.json(resSQL_err)
