@@ -1,7 +1,7 @@
-import React from "react"
-import styled from "styled-components"
-import instance from "../libs/axios"
-import { Link } from "react-router-dom"
+import React from 'react'
+import styled from 'styled-components'
+import instance from '../libs/axios'
+import { Link } from 'react-router-dom'
 
 const HeaderBar = styled.div`
   height: 7vh;
@@ -41,17 +41,17 @@ const Tbody = styled.div`
   overflow-y: scroll;
   user-select: none;
   ::-webkit-scrollbar {
-    width: 0.5em;
-    height: 2em;
+    width: 0.4em;
+    height: 1em;
   }
   /* ::-webkit-scrollbar-button {
         background: #ccc
     } */
   ::-webkit-scrollbar-track-piece {
-    background: yellow;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: green;
+    background: gray;
   }
 `
 
@@ -61,7 +61,7 @@ const GroupBtn = styled.div`
 
 // order status
 const Status = styled.div`
-  color: ${props => (props.status === "prepared" ? "green" : "#da8400")};
+  color: ${props => (props.status === 'prepared' ? 'green' : '#da8400')};
   /* //  */
 `
 class UserOrderlist extends React.Component {
@@ -69,7 +69,7 @@ class UserOrderlist extends React.Component {
     orders: []
   }
   componentWillMount = async () => {
-    let billid = JSON.parse(localStorage.getItem("bill")).id
+    let billid = JSON.parse(localStorage.getItem('bill')).id
     let orders = await instance
       .get(`/order/bill/${billid}`)
       .then(resp => resp.data)
@@ -98,7 +98,7 @@ class UserOrderlist extends React.Component {
   onSubmit = () => {}
   onChange = e => {
     // e
-    console.log(e)
+    // console.log(e)
   }
 
   render = () => (
@@ -124,9 +124,9 @@ class UserOrderlist extends React.Component {
               <Status className="col-2" status={v.orderStatus}>
                 <i
                   className={`fa fa-${
-                    v.orderStatus === "prepared" ? "bars" : "check-circle"
+                    v.orderStatus === 'prepared' ? 'bars' : 'check-circle'
                   }`}
-                />{" "}
+                />{' '}
                 &nbsp;
                 {v.orderStatus}
               </Status>

@@ -18,54 +18,10 @@ const Select = styled.select`
   width: 200px;
 `
 
-const Table = styled.div`
-  margin-top: 20px;
-  background: #fff;
-  height: 380px;
-  padding: 0 15px;
-  overflow: scroll;
-  ::-webkit-scrollbar {
-    width: 0.5em;
-    height: 2em;
-  }
-  /* ::-webkit-scrollbar-button {
-        background: #ccc
-    } */
-  ::-webkit-scrollbar-track-piece {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #ddd;
-  }
-`
-
-const Thead = styled.div`
-  border: 1px solid #000;
-`
-
-const GroupAction = styled.div`
-  & > button {
-    margin: 0 5px;
-    cursor: pointer;
-  }
-`
-
-const Row = styled.div`
-  padding: 5px 0;
-  border-bottom: 1px solid #ddd;
-  &:hover {
-    background-color: #eee;
-  }
-`
-const Body = styled.div`
-  margin-top: 30px;
-  height: 100%;
-`
-
 class StaffManage extends React.Component {
   state = {
     branchs: [],
-    selectedBranch: 5,
+    selectedBranch: 1,
     staffs: [],
     modalshow: false,
     editName: '',
@@ -73,12 +29,12 @@ class StaffManage extends React.Component {
     editbranch: ''
   }
   componentWillMount = async () => {
-    console.log(this.props.location)
+    // console.log(this.props.location)
     let branchData = await instance.get(`/branch`).then(res => res.data.data)
-    console.log(branchData)
+    // console.log(branchData)
     this.setState({ branchs: branchData })
 
-    let staffData = await instance.get(`/branch/5/staff`).then(res => res.data)
+    let staffData = await instance.get(`/branch/1/staff`).then(res => res.data)
     staffData = staffData.data
     this.setState({ staffs: staffData })
   }
@@ -97,14 +53,14 @@ class StaffManage extends React.Component {
   onEditStaff = async e => {
     let data = await instance.get(`/staff/${e}`).then(res => res.data)
     data = data.data[0]
-    console.log(data)
+    // console.log(data)
     this.setState({
       editName: `${data.fname} ${data.lname}`,
       editposition: data.posName,
       editbranch: data.branchId,
       modalshow: true
     })
-    console.log(this.state)
+    // console.log(this.state)
   }
 
   onDeleteStaff = async e => {}
@@ -159,34 +115,30 @@ class StaffManage extends React.Component {
             </div>
           </div>
           <div className="row justify-content-center">
-            <div className="col-12 col-md-9">
-              <Table>
-                <div
-                  className="row"
-                  style={{
-                    position: 'fixed',
-                    width: '64%',
-                    zIndex: 2,
-                    background: '#fff',
-                    textAlign: 'center'
-                  }}
-                >
-                  <Thead className="col-1">index</Thead>
-                  <Thead className="col-4">name</Thead>
-                  <Thead className="col-2">billCount</Thead>
-                  <Thead className="col-2">position</Thead>
-                  <Thead className="col-3">action</Thead>
-                </div>
-                <Body>
+            <div className="col-12 col-md-12 justify-content-center">
+              <table
+                class="table table-hover bg-white table-responsive mx-auto"
+                style={{ marginTop: '20px', maxHeight: '70vh' }}
+              >
+                <thead className="text-center">
+                  <tr>
+                    <th scope="col">Staff id</th>
+                    <th scope="col">Full name</th>
+                    <th scope="col">Bill Count</th>
+                    <th scope="col">Position</th>
+                    <th scope="col">action</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {this.state.staffs.map((v, i) => (
-                    <Row className="row text-center" key={i}>
-                      <div className="col-1 ">{v.staffId}</div>
-                      <div className="col-4 text-left">{v.name}</div>
-                      <div className="col-2">{v.billCount}</div>
-                      <div className="col-2">{v.posName}</div>
+                    <tr>
+                      <th scope="row">{v.staffId}</th>
+                      <td>{v.name}</td>
+                      <td>{v.billCount}</td>
+                      <td>{v.posName}</td>
 
                       {v.posName === 'Staff' ? (
-                        <GroupAction className="col-3">
+                        <td>
                           <button
                             className="col-5 btn-sm btn btn-warning"
                             onClick={() => this.onEditStaff(v.staffId)}
@@ -199,16 +151,16 @@ class StaffManage extends React.Component {
                           >
                             <i className="fa fa-trash" /> delete
                           </button>
-                        </GroupAction>
+                        </td>
                       ) : (
-                        <div className="col-3">
+                        <td>
                           <span className="text-muted">ไม่อนุญาตแก้ไข</span>
-                        </div>
+                        </td>
                       )}
-                    </Row>
+                    </tr>
                   ))}
-                </Body>
-              </Table>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

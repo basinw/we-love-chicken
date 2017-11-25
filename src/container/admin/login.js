@@ -14,7 +14,8 @@ const LeftSide = styled.div`
   font-weight: bold;
   display: flex;
   align-items: flex-end;
-  background-color: #007be8;
+  background-color: gray; //#007be8;
+  background-position: center;
 `
 
 const RightSide = styled.div`
@@ -54,6 +55,7 @@ class Login extends React.Component {
 
   changeState = (args, value) => {
     value = value.target.value
+    // eslint-disable-next-line
     this.state[args] = value
     this.setState({ valid: true })
   }
@@ -67,7 +69,7 @@ class Login extends React.Component {
       })
       .then(resp => resp.data)
     authen = authen.data
-    console.log(authen)
+    // console.log(authen)
     if (authen.length !== 0) {
       localStorage.setItem(
         'staff',

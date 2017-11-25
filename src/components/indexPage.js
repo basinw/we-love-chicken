@@ -1,16 +1,16 @@
-import React from "react";
-import styled from "styled-components";
-import instance from "../libs/axios";
-import swal from "sweetalert2";
+import React from 'react'
+import styled from 'styled-components'
+import instance from '../libs/axios'
+import swal from 'sweetalert2'
 
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom'
 
-import howTo from "../static/img/how-2.png";
+import howTo from '../static/img/how-2.png'
 
 const IdexContainer = styled.div`
   height: 73vh;
   background: #c1b482;
-`;
+`
 
 const OrderList = styled.div`
   height: 73vh;
@@ -21,7 +21,7 @@ const OrderList = styled.div`
   text-align: center;
   position: relative;
   overflow: hidden;
-`;
+`
 
 const OrderGroupBtn = styled.div`
   background: #f5f6f7;
@@ -35,23 +35,23 @@ const OrderGroupBtn = styled.div`
   & button {
     cursor: pointer;
   }
-`;
+`
 
 const CardContainer = styled.div`
   min-height: 60vh;
-`;
+`
 
 const FixedIMG = styled.img`
   height: 11em;
   object-fit: cover;
-  filter: ${props => props.status === 0 && "grayscale(100%) !important"};
-`;
+  filter: ${props => props.status === 0 && 'grayscale(100%) !important'};
+`
 
 const CatStyle = styled.div`
   height: 7vh;
   background: #fff;
   padding: 20px auto;
-`;
+`
 
 const Category = styled.button`
   display: inline-block;
@@ -71,16 +71,16 @@ const Category = styled.button`
     color: #fff;
     border-radius: 5px;
   }
-`;
+`
 
 const CategoryBar = props => (
   <CatStyle className="container-fluid">
-    <div style={{ padding: "5px 0" }}>
+    <div style={{ padding: '5px 0' }}>
       {props.cats.map((v, i) => (
         <Category
           key={i}
           onClick={() => {
-            props.onClickCat(v.cateId);
+            props.onClickCat(v.cateId)
           }}
           selectedCat={props.selCat}
           cat={v.cateName}
@@ -91,19 +91,19 @@ const CategoryBar = props => (
       ))}
     </div>
   </CatStyle>
-);
+)
 
 const EmptyOrderList = props => (
   <div>
     ยังไม่มีรายการอาหารที่จะสั่ง
     <hr />
     กรุณากด <br />
-    <img src={howTo} alt="how-to-use" />
+    <img className="img-fluid" src={howTo} alt="how-to-use" />
     เมนูทางด้านซ้าย<br />
     เพื่อเริ่มต้นการสั่งอาหาร
     <hr />
   </div>
-);
+)
 
 const StyleFillOL = styled.div`
   width: 100%;
@@ -117,7 +117,7 @@ const StyleFillOL = styled.div`
   position: absolute;
   left: 0;
   right: -15px;
-`;
+`
 
 const StyleOrderQuan = styled.button`
   margin: 0 2px;
@@ -131,7 +131,7 @@ const StyleOrderQuan = styled.button`
     font-size: 1.25em;
     margin: 0;
   }
-`;
+`
 
 const NoQuan = styled.span`
   display: inline-block;
@@ -139,26 +139,26 @@ const NoQuan = styled.span`
   width: 25px;
   color: #fff;
   text-align: center;
-`;
+`
 
 const FillOrderList = props => (
-  <div style={{ position: "relative", width: "100%", height: "100%" }}>
+  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
     <StyleFillOL>
       {props.cartList.map((v, i) => (
-        <div key={i} style={{ minHeight: "50px" }}>
+        <div key={i} style={{ minHeight: '50px' }}>
           <div className="row">
             <div
               className="col-7 no-pad-r text-left"
-              style={{ paddingTop: "0px" }}
+              style={{ paddingTop: '0px' }}
             >
               {v.menuName} ({v.sizeName})
             </div>
             <div className="col-5 no-pad-a text-center">
-              <StyleOrderQuan onClick={() => props.editQ(v, "-")}>
+              <StyleOrderQuan onClick={() => props.editQ(v, '-')}>
                 <i className="fa fa-minus" />
               </StyleOrderQuan>
               <NoQuan>{v.quantity}</NoQuan>
-              <StyleOrderQuan onClick={() => props.editQ(v, "+")}>
+              <StyleOrderQuan onClick={() => props.editQ(v, '+')}>
                 <i className="fa fa-plus" />
               </StyleOrderQuan>
             </div>
@@ -168,17 +168,41 @@ const FillOrderList = props => (
       ))}
     </StyleFillOL>
   </div>
-);
+)
 
-const PageLinkGroup = styled.a`
+const PageLinkGroup = styled.div`
   & > a {
     /* display: inline-block; */
   }
-  /* style={{marginBottom: '5px'}} */
+
+  ::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.25em;
+  }
+  /* ::-webkit-scrollbar-button {
+        background: #ccc
+    } */
+  ::-webkit-scrollbar-track-piece {
+    background: transparent;
+    /* yellow; */
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #9c8d53;
+  }
   display: flex;
-  justify-content: center;
   text-align: center;
-`;
+  margin: auto;
+  ${props =>
+    props.length < 17
+      ? `
+    justify-content: center;
+    
+   `
+      : `
+  overflow-x: scroll;
+   
+   `};
+`
 
 const PageBtn = styled.button`
   /* padding: 5px 10px; */
@@ -190,7 +214,7 @@ const PageBtn = styled.button`
   width: 35px;
   height: 35px;
   margin: 10px 5px;
-`;
+`
 class IndexComponent extends React.Component {
   state = {
     categorys: [],
@@ -203,35 +227,39 @@ class IndexComponent extends React.Component {
     selectedList: [],
     tableNo: 1,
     branch: {}
-  };
+  }
 
   componentWillMount = async () => {
     window.onbeforeunload = () => {
       if (this.state.selectedList.length > 0) {
-        return "Are you sure you want to leave?";
+        return 'Are you sure you want to leave?'
       }
-    };
+    }
+    let tableid = JSON.parse(localStorage.getItem('table'))
+    if (tableid === null || tableid === undefined) {
+      localStorage.setItem('table', JSON.stringify({ id: 1 }))
+    }
     // return null if that's not defined
-    let bill = JSON.parse(localStorage.getItem("bill"));
+    let bill = JSON.parse(localStorage.getItem('bill'))
     if (bill == null) {
       let result = await instance
-        .post("/bill", {
+        .post('/bill', {
           branchId: 1
         })
-        .then(data => data.data);
+        .then(data => data.data)
 
       // console.log(result)
       localStorage.setItem(
-        "bill",
+        'bill',
         JSON.stringify({
           id: result.data.insertId
         })
-      );
+      )
     } else {
       // searching for bill
       let billData = await instance
         .get(`/bill/${bill.id}`)
-        .then(resp => resp.data);
+        .then(resp => resp.data)
       if (billData.data.length === 0) {
         // console.log('empty data')
       }
@@ -239,77 +267,77 @@ class IndexComponent extends React.Component {
 
     // localStorage.removeItem('scc-user')
 
-    let data = await instance.get(`/category`).then(resp => resp.data);
+    let data = await instance.get(`/category`).then(resp => resp.data)
     if (data.status) {
-      let cats = data.data;
+      let cats = data.data
       this.setState({
         categorys: cats,
         selectedCat: cats[0].cateId
-      });
+      })
     }
 
-    data = await instance.get(`/menu/cate/1`).then(resp => resp.data);
+    data = await instance.get(`/menu/cate/1`).then(resp => resp.data)
     if (data.status) {
-      let rs = data.data;
+      let rs = data.data
       // console.log(rs)
       // for find indx of page
-      let max = Math.ceil(rs.length / this.state.menuPerPage);
-      let page = [];
+      let max = Math.ceil(rs.length / this.state.menuPerPage)
+      let page = []
       for (let i = 0; i < max; i++) {
-        page.push(i + 1);
+        page.push(i + 1)
       }
 
       // show menu for index page
-      let currentP = this.state.currentPage;
-      let menuPerP = this.state.menuPerPage;
+      let currentP = this.state.currentPage
+      let menuPerP = this.state.menuPerPage
       let showmenu = rs.filter(
         (v, i) => i < currentP * menuPerP && i >= (currentP - 1) * menuPerP
-      );
+      )
       // console.log(d)
       this.setState({
         showmenu,
         page,
         menudata: rs
-      });
+      })
     }
-  };
+  }
 
   selectCat = async cat => {
     if (this.state.selectedCat === cat) {
-      return;
+      return
     }
     // console.log(cat)
-    let data = await instance.get(`/menu/cate/${cat}`).then(resp => resp.data);
+    let data = await instance.get(`/menu/cate/${cat}`).then(resp => resp.data)
     if (data.status) {
-      let rs = data.data;
+      let rs = data.data
 
       // for find indx of page
-      let max = Math.ceil(rs.length / this.state.menuPerPage);
-      let page = [];
+      let max = Math.ceil(rs.length / this.state.menuPerPage)
+      let page = []
       for (let i = 0; i < max; i++) {
-        page.push(i + 1);
+        page.push(i + 1)
       }
 
       // show menu for index page
-      let currentP = 1;
-      let menuPerP = this.state.menuPerPage;
+      let currentP = 1
+      let menuPerP = this.state.menuPerPage
       let showmenu = rs.filter(
         (v, i) => i < currentP * menuPerP && i >= (currentP - 1) * menuPerP
-      );
+      )
 
       this.setState({
         showmenu,
         page,
         menudata: rs,
         currentPage: currentP
-      });
+      })
     }
-    this.setState({ selectedCat: cat });
-  };
+    this.setState({ selectedCat: cat })
+  }
 
   addToList = async e => {
-    let ListCart = this.state.selectedList;
-    let index = ListCart.findIndex((v, i) => v.menuPriceId === e.menuPriceId);
+    let ListCart = this.state.selectedList
+    let index = ListCart.findIndex((v, i) => v.menuPriceId === e.menuPriceId)
     // console.log(e)
     if (e.serveWithId !== null) {
       //   let result = await instance.get(`/menu/servewith/${e.menuId}`)
@@ -318,106 +346,107 @@ class IndexComponent extends React.Component {
     }
     if (index > -1) {
       // ถ้ามีข้อมูล
-      ListCart[index].quantity += 1;
+      ListCart[index].quantity += 1
     } else {
       let product = {
         ...e,
         quantity: 1
-      };
-      ListCart.push(product);
+      }
+      ListCart.push(product)
     }
-    this.setState({ selectedList: ListCart });
-  };
+    this.setState({ selectedList: ListCart })
+  }
 
   editQuantity = (data, op) => {
     // console.log(data)
     // console.log(op)
     switch (op) {
-      case "+":
-        data.quantity += 1;
-        break;
-      case "-":
-        data.quantity -= 1;
+      case '+':
+        data.quantity += 1
+        break
+      case '-':
+        data.quantity -= 1
         if (data.quantity === 0) {
-          let cart = this.state.selectedList;
+          let cart = this.state.selectedList
           let index = cart.findIndex(
             (v, i) => data.menuPriceId === v.menuPriceId
-          );
-          cart.splice(index, 1);
+          )
+          cart.splice(index, 1)
         }
-        break;
+        break
       // eslint-disable-next-line
       default:
-        "";
+        // eslint-disable-next-line
+        ''
     }
-    this.setState({});
-  };
+    this.setState({})
+  }
 
   changePage = e => {
-    let currentP = e;
-    let menuPerP = this.state.menuPerPage;
-    let all = this.state.menudata;
+    let currentP = e
+    let menuPerP = this.state.menuPerPage
+    let all = this.state.menudata
     let showmenu = all.filter(
       (v, i) => i < currentP * menuPerP && i >= (currentP - 1) * menuPerP
-    );
+    )
     this.setState({
       currentPage: e,
       showmenu
-    });
-  };
+    })
+  }
 
   onSubmit = () => {
-    let billId = JSON.parse(localStorage.getItem("bill")).id;
+    let billId = JSON.parse(localStorage.getItem('bill')).id
 
     swal({
-      title: "Confirm orders",
+      title: 'Confirm orders',
       html: `you have ${this.state.selectedList.length} orders`,
       showCancelButton: true,
-      confirmButtonText: "Confirm",
-      customClass: "Button",
+      confirmButtonText: 'Confirm',
+      customClass: 'Button',
       showLoaderOnConfirm: true,
       preConfirm: () => {
         return new Promise((resolve, reject) => {
-          let result; // = {status: true}
+          let result // = {status: true}
           this.state.selectedList.map(async (d, i) => {
-            result = await instance.post("/order", {
+            result = await instance.post('/order', {
               tableId: this.state.tableNo,
               billId: billId,
-              orderStatus: "prepared",
+              orderStatus: 'prepared',
               menupriceId: d.menuPriceId,
               price: d.price,
               quantity: d.quantity
-            });
-          });
-          resolve(result);
-        });
+            })
+          })
+          resolve(result)
+        })
       }
     }).then(data => {
       //   console.log(data)
       if (data.dismiss !== undefined) {
-        return;
+        return
       }
 
       if (data.value) {
-        this.setState({ selectedList: [] });
+        this.setState({ selectedList: [] })
         swal({
-          title: "Success",
+          title: 'Success',
           html: `your order was created`,
-          type: "success",
-          confirmButtonText: "OK"
-        });
+          type: 'success',
+          confirmButtonText: 'OK'
+        })
       } else {
         swal({
-          title: "Cancel",
+          title: 'Cancel',
           text: `Your order was not create.`,
-          type: "warning",
-          confirmButtonText: "OK"
-        });
+          type: 'warning',
+          confirmButtonText: 'OK'
+        })
       }
-    });
+    })
 
     // console.log('on submit')
-  };
+  }
 
   render() {
     return (
@@ -430,7 +459,7 @@ class IndexComponent extends React.Component {
         <IdexContainer className="container-fluid">
           <div className="row justify-content-between">
             <div className="col-9 ">
-              <PageLinkGroup>
+              <PageLinkGroup length={this.state.page.length}>
                 {this.state.page.map(e => (
                   <span key={e} className="page-item">
                     <PageBtn
@@ -438,7 +467,6 @@ class IndexComponent extends React.Component {
                       onClick={() => this.changePage(e)}
                     >
                       {e}
-                      <span className="sr-only">(current)</span>
                     </PageBtn>
                   </span>
                 ))}
@@ -448,7 +476,7 @@ class IndexComponent extends React.Component {
                   <div
                     className="col-4"
                     key={i}
-                    style={{ transition: "all .2s linear 0s" }}
+                    style={{ transition: 'all .2s linear 0s' }}
                   >
                     <CardContainer className="card">
                       <FixedIMG
@@ -459,7 +487,7 @@ class IndexComponent extends React.Component {
                       />
                       <div
                         className="card-body"
-                        style={{ position: "relative" }}
+                        style={{ position: 'relative' }}
                       >
                         <h4 className="card-title">
                           {v.menuName} <b>({v.sizeName})</b>
@@ -472,9 +500,9 @@ class IndexComponent extends React.Component {
                         <hr />
                         <div
                           style={{
-                            position: "absolute",
-                            bottom: "10%",
-                            width: "85%"
+                            position: 'absolute',
+                            bottom: '10%',
+                            width: '85%'
                           }}
                         >
                           {v.status === 0 ? (
@@ -488,13 +516,13 @@ class IndexComponent extends React.Component {
                             <div>
                               <div
                                 className="size-block"
-                                style={{ marginBottom: "10px" }}
+                                style={{ marginBottom: '10px' }}
                               >
                                 price:
                               </div>
                               <button
                                 className={`btn btn-block btn-warning text-center`}
-                                style={{ cursor: "pointer" }}
+                                style={{ cursor: 'pointer' }}
                                 onClick={() => this.addToList(v)}
                               >
                                 <span>{`${v.price} $`}</span>
@@ -536,8 +564,8 @@ class IndexComponent extends React.Component {
           </div>
         </IdexContainer>
       </div>
-    );
+    )
   }
 }
 
-export default IndexComponent;
+export default IndexComponent

@@ -21,7 +21,7 @@ const requireAuth = status => {
         componentWillMount = () => {
           let token = localStorage.getItem('_token')
           let path = this.props.location.pathname
-          console.log(path)
+          // console.log(path)
           if (token === null || token === undefined) {
             this.props.history.push('/login')
           } else {

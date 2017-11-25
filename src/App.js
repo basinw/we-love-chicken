@@ -1,18 +1,18 @@
-import React, { Component } from "react";
-import { withRouter, Route, Switch } from "react-router-dom";
-import { injectGlobal } from "styled-components";
+import React, { Component } from 'react'
+import { withRouter, Route, Switch } from 'react-router-dom'
+import { injectGlobal } from 'styled-components'
 
 // import Index from './container/user'
 // import Orderlist from './container/user/orderlist'
 // import CheckBill from './container/user/checkbill'
 
-import UserGroup from "./container/user/userpage";
-import AdminGroup from "./container/admin/adminpage";
-import Login from "./container/admin/login";
+import UserGroup from './container/user/userpage'
+import AdminGroup from './container/admin/adminpage'
+// import Login from "./container/admin/login";
 
 // import static css
-import "./static/css/bootstrap.min.css";
-import "./static/css/font-awesome.min.css";
+import './static/css/bootstrap.min.css'
+import './static/css/font-awesome.min.css'
 
 injectGlobal`
   body {
@@ -39,7 +39,7 @@ injectGlobal`
   .col-4 {
     padding: 0 9px;
   }
-`;
+`
 
 class App extends Component {
   render = () => (
@@ -50,7 +50,7 @@ class App extends Component {
         {/* <Route exact path="/login" component={Login} /> */}
       </Switch>
     </div>
-  );
+  )
 }
 
-export default withRouter(App);
+export default withRouter(App)

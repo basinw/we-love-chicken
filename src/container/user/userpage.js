@@ -10,6 +10,7 @@ import CheckBill from './checkbill'
 import Login from '../admin/login'
 import Manage from '../admin/manage/index'
 import Staff from '../admin/manage/staff'
+import Income from '../admin/manage/income'
 
 import HeaderComponent from '../../components/Header'
 
@@ -72,6 +73,7 @@ class UserPage extends React.Component {
         <Route exact path={`/login`} component={Login} />
         <Route exact path={`/manage`} component={Manage} />
         <Route exact path={`/manage/staff`} component={Staff} />
+        <Route exact path={`/manage/income`} component={Income} />
       </Switch>
     </div>
   )

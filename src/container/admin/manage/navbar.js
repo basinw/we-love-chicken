@@ -1,17 +1,7 @@
 import React from 'react'
 
-import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-const Button = styled.button`
-  background: transparent;
-  cursor: pointer;
-
-  & + div {
-    left: auto;
-    right: 0;
-  }
-`
 class Nav extends React.Component {
   state = {
     dropdown: false,
@@ -27,7 +17,7 @@ class Nav extends React.Component {
 
   componentWillMount = () => {
     let data = JSON.parse(localStorage.getItem('staff'))
-    console.log(data)
+    // console.log(data)
     this.setState({
       name: data.name,
       position: data.position
@@ -63,7 +53,7 @@ class Nav extends React.Component {
               Order
             </Link>
           </li>
-          {this.state.position === 'Manager' && (
+          {/* {this.state.position === 'Manager' && (
             <li
               className={`nav-item ${this.props.location.pathname ===
                 '/manage/menu' && 'active'}`}
@@ -72,7 +62,7 @@ class Nav extends React.Component {
                 Menu
               </Link>
             </li>
-          )}
+          )} */}
           {this.state.position === 'Manager' && (
             <li
               className={`nav-item ${this.props.location.pathname ===
