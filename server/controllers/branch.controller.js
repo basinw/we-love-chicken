@@ -169,5 +169,41 @@ module.exports = (con, resSQL_err) => ({
         })
       }
     )
+  },
+  getTotal: (req, res) => {
+    const id = req.params.id
+    const from = req.body.from
+    const to = req.body.to
+    if (from !== undefined && to !== undefined) {
+      con.query(
+        `
+        SELECT branchName, SUM(total) AS "totalIncome"
+        FROM Bill JOIN Branch
+        ON Bill.branchId = Branch.branchId
+        WHERE Branch.branchId = ${id} AND Bill.timeStamp BETWEEN '${
+          from
+        } 00:00' AND '${to} 23:59'
+        AND time(Bill.timeStamp) BETWEEN Branch.openTime AND Branch.closeTime
+        GROUP BY Bill.branchId HAVING COUNT(billId) > 0;
+        `,
+        (err, result, fields) => {
+          if (err) res.json(resSQL_err)
+          let resData = {
+            ...result[0],
+            from,
+            to
+          }
+          res.json({
+            status: true,
+            data: resData
+          })
+        }
+      )
+    } else {
+      res.json({
+        status: false,
+        data: 'information is not defined'
+      })
+    }
   }
 })

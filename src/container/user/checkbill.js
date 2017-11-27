@@ -60,7 +60,7 @@ class CheckBill extends React.Component {
       data = data.data
       let bill = data.bill
       let t = new Date(bill.timeStamp)
-      t.setHours(t.getHours() + 7)
+      // t.setHours(t.getHours() + 7)
       // console.log(bill)
       let time = `${t.getDate()} ${
         allMonth[t.getMonth()]

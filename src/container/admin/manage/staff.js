@@ -117,7 +117,7 @@ class StaffManage extends React.Component {
           <div className="row justify-content-center">
             <div className="col-12 col-md-12 justify-content-center">
               <table
-                class="table table-hover bg-white table-responsive mx-auto"
+                className="table table-hover bg-white table-responsive mx-auto"
                 style={{ marginTop: '20px', maxHeight: '70vh' }}
               >
                 <thead className="text-center">

@@ -41,7 +41,7 @@ const Tbody = styled.div`
   overflow-y: scroll;
   user-select: none;
   ::-webkit-scrollbar {
-    width: 0.4em;
+    width: 1em;
     height: 1em;
   }
   /* ::-webkit-scrollbar-button {

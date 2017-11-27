@@ -116,6 +116,7 @@ module.exports = (express, connection) => {
     branchRouter.route('/:id/staff').get(BranchController.getstaff)
     branchRouter.route('/:id').put(BranchController.update)
     branchRouter.route('/:id').delete(BranchController.delete)
+    branchRouter.route('/:id/income').post(BranchController.getTotal)
   })
 
   // // --------------------------
