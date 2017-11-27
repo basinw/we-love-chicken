@@ -4,14 +4,6 @@ import styled from 'styled-components'
 import withAuth from '../../../libs/withAuth'
 import instance from '../../../libs/axios'
 
-import 'react-dates/initialize'
-import 'react-dates/lib/css/_datepicker.css'
-import {
-  DateRangePicker,
-  SingleDatePicker,
-  DayPickerRangeController
-} from 'react-dates'
-
 import swal from 'sweetalert2'
 
 import Nav from './navbar'

@@ -126,6 +126,7 @@ const StyleOrderQuan = styled.button`
   cursor: pointer;
   font-weight: bold;
   border: 0;
+  padding: 0 4px;
   font-size: 1.5em;
   @media only screen and (max-width: 1025px) {
     font-size: 1.25em;
